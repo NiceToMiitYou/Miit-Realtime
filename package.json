@@ -1,0 +1,16 @@
+{
+  "name": "miit-realtime",
+  "version": "0.0.0",
+  "description": "Miit Realtime server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tacyniak Boris <boris.tacyniak@itevents.fr>",
+  "license": "ISC",
+  "dependencies": {
+    "engine.io": "^1.5.1",
+    "primus": "^3.0.2",
+    "winston": "^1.0.0"
+  }
+}
