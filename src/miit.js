@@ -1,24 +1,25 @@
 'use strict';
 
-var authorize = require('./authorize.js'),
-    logger    = require('./logger.js');
+function Miit(primus) {
+    // The configuration of the application
+    this.config = require('./config');
 
-module.exports = function Miit(primus) {
+    // The logger
+    this.logger = require('./logger');
+
+    // Primus
+    this.primus = primus;
+
     //
     // Add the authorization hook.
     //
-    primus.authorize(authorize);
 
+    var authorize = require('./authorize').bind(this);
+    var requests  = require('./requests');
 
-    primus.on('connection', function connection(spark) {
-        logger.info('New connection.');
-    });
+    this.primus.authorize(authorize);
 
-    primus.on('disconnection', function disconnection(spark) {
-        logger.info('Disconnection.');
-    });
-
-    primus.on('error', function error(err) {
-        logger.error('Something horrible has happened.', err.stack);
-    });
+    this.requests = requests(this);
 };
+
+module.exports = Miit;

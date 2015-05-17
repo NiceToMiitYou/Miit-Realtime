@@ -1,12 +1,12 @@
+'use strict';
 
+// Instanciate the authorization function
 module.exports = function (req, done) {
     var userId = req.query.userId,
         teamId = req.query.teamId,
         token  = req.query.token;
 
-    console.log('userId:', userId);
-    console.log('teamId:', teamId);
-    console.log('token:',  token);
+    this.requests.checkAuthorization(userId, teamId, token);
 
     if (!userId || !teamId || !token) {
         return done({
