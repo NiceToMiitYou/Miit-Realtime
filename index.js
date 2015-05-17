@@ -2,6 +2,7 @@
 
 // Load dependencies
 var Primus         = require('primus'),
+    Rooms          = require('primus-rooms'),
     http           = require('http'),
     express        = require('express'),
     bodyParser     = require('body-parser'),
@@ -52,6 +53,9 @@ var server = http.createServer(app),
 // use the same middleware for primus
 primus.before('cookies', cookies);
 primus.before('session', session);
+
+// Enable rooms in primus
+primus.use('rooms', Rooms);
 
 // Instanciate the miit server
 var miit = new Miit(primus);
