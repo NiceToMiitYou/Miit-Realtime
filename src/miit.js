@@ -1,6 +1,6 @@
 'use strict';
 
-function Miit(primus) {
+function Miit(primus, onReady) {
     // The configuration of the application
     this.config = require('./config');
 
@@ -19,7 +19,7 @@ function Miit(primus) {
 
     this.primus.authorize(authorize);
 
-    this.requests = requests(this);
+    this.requests = requests(this, onReady);
 };
 
 module.exports = Miit;

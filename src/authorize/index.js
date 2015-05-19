@@ -6,14 +6,27 @@ module.exports = function (req, done) {
         teamId = req.query.teamId,
         token  = req.query.token;
 
-    this.requests.checkAuthorization(userId, teamId, token);
-
-    if (!userId || !teamId || !token) {
+    if (!userId || !teamId || !token)
+    {
         return done({
             statusCode: 403,
             message: 'Go away!'
         });
-    } else {
-        return done();
+    }
+    else
+    {
+        this.requests.checkAuthorization(userId, teamId, token, function(data) {
+            if(data.type !== 'SESSION_UNDEFINED')
+            {
+                return done();
+            }
+            else
+            {
+                return done({
+                    statusCode: 403,
+                    message: 'SESSION_UNDEFINED'
+                });
+            }
+        });
     }
 };

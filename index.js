@@ -50,6 +50,15 @@ var server = http.createServer(app),
         }
     });
 
+function onReady() {
+    //
+    // Begin accepting connections.
+    //
+    server.listen(PORT, function listening() {
+      console.log('Listening on port:', PORT);
+    });
+}
+
 // use the same middleware for primus
 primus.before('cookies', cookies);
 primus.before('session', session);
@@ -58,11 +67,4 @@ primus.before('session', session);
 primus.use('rooms', Rooms);
 
 // Instanciate the miit server
-var miit = new Miit(primus);
-
-//
-// Begin accepting connections.
-//
-server.listen(PORT, function listening() {
-  console.log('Listening on port:', PORT);
-});
+var miit = new Miit(primus, onReady);

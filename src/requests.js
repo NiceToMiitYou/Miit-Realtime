@@ -1,10 +1,10 @@
 'use strict';
 
 // Expose the object
-module.exports = function Requests(miit) {
+module.exports = function Requests(miit, onReady) {
     
     // Get the access token object.
-    var token;
+    var token, initialized = false;
 
     // Load dependencies
     var oauth2 = require('simple-oauth2')(miit.config);
@@ -25,10 +25,17 @@ module.exports = function Requests(miit) {
     function saveToken(error, result) {
         if(error)
         {
-            miit.logger.error('Access Token Error', error.message);
+            miit.logger.error('Access Token Error', error, error.message);
         }
         else
         {
+            if(false === initialized)
+            {
+                initialized = true;
+
+                onReady();
+            }
+
             miit.logger.debug(result);
 
             token = oauth2.accessToken.create(result);
@@ -37,11 +44,20 @@ module.exports = function Requests(miit) {
 
     // Check if expire then request
     function checkExpire(cb) {
-        if(token.expired())
+        if(token && token.expired())
         {
             token.refresh(function(error, result) {
-                saveToken(error, result);
-                cb();
+                if(error)
+                {
+                    miit.logger.error('Refresh Token Error', error, error.message);
+                }
+                else
+                {
+                    miit.logger.debug(result);
+
+                    token = result;
+                    cb();
+                }
             });
         }
         else
@@ -52,6 +68,12 @@ module.exports = function Requests(miit) {
 
     // Request the server and check if token still valid
     function request(method, path, params, cb) {
+        // Handle optional parameter
+        if(typeof params === 'function') {
+            cb = params;
+            params = {};
+        }
+
         // Check if expired
         checkExpire(function() {
             miit.logger.debug('Request to:', path);
@@ -59,7 +81,13 @@ module.exports = function Requests(miit) {
             // Set the access token
             params.access_token = token.token.access_token;
             // Send the request
-            oauth2.api(method, path, params, cb);
+            oauth2.api(method, path, params, function(error, data) {
+                miit.logger.debug(data);
+
+                if(typeof cb === 'function') {
+                    cb(error, data);
+                }
+            });
         });
     }
 
@@ -92,6 +120,9 @@ module.exports = function Requests(miit) {
             // Generate the path
             var path = '/realtime/check/' + userId + '/' + teamId + '/' + token;
 
+            get(path, function(error, data) {
+                cb(data);
+            });
         },
 
         request: request,
