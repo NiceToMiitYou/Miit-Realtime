@@ -53,8 +53,6 @@ module.exports = function Requests(miit, onReady) {
                 }
                 else
                 {
-                    miit.logger.debug(result);
-
                     token = result;
                     cb();
                 }
@@ -126,9 +124,9 @@ module.exports = function Requests(miit, onReady) {
         },
 
         request: request,
-        get:    get,
-        post:   post,
-        put:    put,
-        delete: del
+        get:     get,
+        post:    post,
+        put:     put,
+        delete:  del
     };
 };

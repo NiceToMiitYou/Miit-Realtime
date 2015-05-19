@@ -2,6 +2,8 @@
 
 // Instanciate the authorization function
 module.exports = function (req, done) {
+    var miit = this;
+
     var userId = req.query.userId,
         teamId = req.query.teamId,
         token  = req.query.token;
@@ -15,9 +17,18 @@ module.exports = function (req, done) {
     }
     else
     {
-        this.requests.checkAuthorization(userId, teamId, token, function(data) {
-            if(data.type !== 'SESSION_UNDEFINED')
+        miit.requests.checkAuthorization(userId, teamId, token, function(data) {
+            if(data && data.type && data.type !== 'SESSION_UNDEFINED')
             {
+                miit.stores.TeamStore.createIfNotExist(data.team, function(err) {
+                    if(!err) {
+                        miit.stores.TeamStore.addUserIfNotExist(data.team, data.user);
+                    }
+                });
+
+                req.user = data.user;
+                req.team = data.team;
+
                 return done();
             }
             else
