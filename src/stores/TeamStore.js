@@ -6,6 +6,10 @@ module.exports = function TeamStore(miit) {
     var Team = miit.models.Team;
 
     this.createIfNotExist = function(team, cb) {
+        if(!team) {
+            return;
+        }
+
         Team.update({
             id: team.id
         }, {
@@ -29,6 +33,10 @@ module.exports = function TeamStore(miit) {
     };
 
     this.addUserIfNotExist = function(team, user, cb) {
+        if(!team || !user) {
+            return;
+        }
+
         var conditions = {
             id: team.id,
             'users.id': { $ne: user.id }
