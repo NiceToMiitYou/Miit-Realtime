@@ -5,7 +5,7 @@ module.exports = function TeamStore(miit) {
     var Status = miit.models.Status;
 
     function updateStatus(status, user, team, cb)  {
-        Status.update({
+        Status.findOneAndUpdate({
                 userId: user.id || '',
                 teamId: team.id || ''
             }, {
