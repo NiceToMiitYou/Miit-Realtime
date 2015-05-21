@@ -25,7 +25,7 @@ module.exports = function Requests(miit, onReady) {
     function saveToken(error, result) {
         if(error)
         {
-            miit.logger.error('Access Token Error', error, error.message);
+            miit.logger.error('Access Token Error:', error, error.message);
         }
         else
         {
@@ -43,13 +43,21 @@ module.exports = function Requests(miit, onReady) {
     }
 
     // Check if expire then request
-    function checkExpire(cb) {
+    function checkExpire(replay, cb) {
         if(token && token.expired())
         {
             token.refresh(function(error, result) {
                 if(error)
                 {
-                    miit.logger.error('Refresh Token Error', error, error.message);
+                    miit.logger.error('Refresh Token Error:', error, error.message);
+
+                    // Try to get the token again
+                    getToken(function(error, result) {
+                        // Save the token
+                        saveToken(error, result);
+                        // Replay the request
+                        replay();
+                    });
                 }
                 else
                 {
@@ -72,8 +80,12 @@ module.exports = function Requests(miit, onReady) {
             params = {};
         }
 
+        var replay = function() {
+            request(method, path, params, cb);
+        };
+
         // Check if expired
-        checkExpire(function() {
+        checkExpire(replay, function() {
             miit.logger.debug('Request to:', path);
 
             // Set the access token

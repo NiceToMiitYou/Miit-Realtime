@@ -1,12 +1,18 @@
 'use strict';
 
+var Apps = [
+    'Chat'
+];
+
 var Models = [
+    'Status',
     'User',
     'Team'
 ];
 
 var Stores = [
-    'TeamStore'
+    'TeamStore',
+    'StatusStore'
 ];
 
 var Managers = [
@@ -14,7 +20,7 @@ var Managers = [
 ];
 
 
-function loadModels(miit) {
+function loadAllInstances(miit) {
     // For each Models
     Models.forEach(function(model) {
         var path = './models/' + model;
@@ -36,6 +42,17 @@ function loadModels(miit) {
         var Manager = require(path);
 
         miit.managers[manager] = new Manager(miit);
+    });
+
+    // For each Apps
+    Apps.forEach(function(app) {
+        var path = './apps/' + app;
+        var App  = require(path);
+
+        var AppInstance = new App(miit);
+        var identifier  = AppInstance.identifier();
+
+        miit.apps[identifier] = AppInstance;
     });
 }
 
@@ -62,13 +79,14 @@ function Miit(primus, onReady) {
     miit.mongoose.connection.on('error',  miit.logger.error.bind(miit.logger, 'Mongo connection error:'));
 
     //
-    // Load models
+    // Load all instances needed
     //
+    miit.apps     = {};
     miit.managers = {};
-    miit.models = {};
-    miit.stores = {};
+    miit.models   = {};
+    miit.stores   = {};
 
-    loadModels(miit);
+    loadAllInstances(miit);
 
     //
     // Add the authorization hook.
