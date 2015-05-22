@@ -6,6 +6,9 @@ module.exports = function Requests(miit, onReady) {
     // Get the access token object.
     var token, initialized = false;
 
+    // create a cache
+    var cache  = require('memory-cache');
+
     // Load dependencies
     var oauth2 = require('simple-oauth2')(miit.config);
 
@@ -90,14 +93,33 @@ module.exports = function Requests(miit, onReady) {
 
             // Set the access token
             params.access_token = token.token.access_token;
-            // Send the request
-            oauth2.api(method, path, params, function(error, data) {
-                miit.logger.debug(data);
 
+            // Cache system
+            var cacheValue = cache.get(path);
+
+            if(method !== 'GET' || !cacheValue) {
+                // Send the request
+                oauth2.api(method, path, params, function(error, data) {
+                    miit.logger.debug('Data from request:', data);
+
+                    // Add to cache
+                    cache.put(path, data, 60000);
+
+                    // Callback
+                    if(typeof cb === 'function') {
+                        cb(error, data);
+                    }
+                });
+            }
+            else
+            {
+                miit.logger.debug('Data from cache:', cacheValue);
+
+                // Callback
                 if(typeof cb === 'function') {
-                    cb(error, data);
+                    cb(null, cacheValue);
                 }
-            });
+            }
         });
     }
 
