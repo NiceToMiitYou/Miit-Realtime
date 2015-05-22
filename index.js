@@ -42,7 +42,7 @@ app.use(session);
 //
 var server = http.createServer(app),
     primus = new Primus(server, {
-        transformer: 'engine.io',
+        transformer: 'sockjs',
         parser: 'JSON',
         session: {
             name:   'miit-session',
