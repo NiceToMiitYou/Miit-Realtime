@@ -2,6 +2,7 @@
 
 module.exports = function ConnectionManager(miit) {
     var StatusStore = miit.stores.StatusStore;
+    var TeamStore   = miit.stores.TeamStore;
 
     function initializeConnections(spark, user, team) {
         // Bind event from client
@@ -20,6 +21,21 @@ module.exports = function ConnectionManager(miit) {
         // Bind status
         onGetStatus(spark, user, team);
 
+        // Bind users
+        onGetUsers(spark, user, team);
+    }
+
+    function onGetUsers(spark, user, team) {
+        spark.on('users:list', function(){
+            miit.logger.debug('Status asked by User', user.id);
+
+            TeamStore.getUsers(team, function(err, users){
+                spark.write({
+                    event: 'users:list',
+                    users: users
+                });
+            });
+        });
     }
 
     function onStatusChanged(team) {

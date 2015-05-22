@@ -43,10 +43,11 @@ module.exports = function TeamStore(miit) {
         };
 
         var user = new User({
-            id:    user.id,
-            name:  user.name  || '',
-            email: user.email || '',
-            roles: user.roles || []
+            id:     user.id,
+            name:   user.name   || '',
+            email:  user.email  || '',
+            avatar: user.avatar || '',
+            roles:  user.roles  || []
         });
 
         var update = {
@@ -64,5 +65,28 @@ module.exports = function TeamStore(miit) {
                 cb(err, doc);
             }
         });
+    };
+
+    this.getUsers = function(team, cb) {
+        Team
+            .findOne({
+                id: team.id
+            }, {
+                _id: false,
+                'users.id':     true,
+                'users.name':   true,
+                'users.avatar': true,
+                'users.roles':  true
+            })
+            .exec(function(err, team) {
+                // Log the error
+                if(err) {
+                    miit.logger.error(err);
+                }
+
+                if(typeof cb === 'function') {
+                    cb(err, (team || {}).users || []);
+                }
+            });
     };
 };
