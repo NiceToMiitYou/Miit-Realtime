@@ -7,7 +7,8 @@ module.exports = function User(miit) {
         name:   String,
         email:  String,
         avatar: String,
-        roles:  [String]
+        roles:  [String],
+        expire: { type: Date, expires: 86400, default: Date.now }
     });
 
     return miit.mongoose.model('User', schema);
