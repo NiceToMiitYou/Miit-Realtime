@@ -2,6 +2,7 @@
 
 module.exports = function ConnectionManager(miit) {
     var StatusStore = miit.stores.StatusStore;
+    var UserStore   = miit.stores.UserStore;
     var TeamStore   = miit.stores.TeamStore;
 
     function initializeConnections(spark, user, team) {

@@ -21,9 +21,11 @@ module.exports = function (req, done) {
             if(data && data.type && data.type !== 'SESSION_UNDEFINED')
             {
                 miit.stores.TeamStore.createIfNotExist(data.team, function(err) {
-                    if(!err) {
-                        miit.stores.TeamStore.addUserIfNotExist(data.team, data.user);
-                    }
+                    miit.stores.UserStore.createIfNotExist(data.user, function(errUser, user) {
+                        if(!err && !errUser) {
+                            miit.stores.TeamStore.addUserIfNotExist(data.team, user._id);
+                        }
+                    });
                 });
 
                 req.user = data.user;

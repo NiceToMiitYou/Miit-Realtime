@@ -32,27 +32,21 @@ module.exports = function TeamStore(miit) {
         });
     };
 
-    this.addUserIfNotExist = function(team, user, cb) {
-        if(!team || !user) {
+    this.addUserIfNotExist = function(team, user_id, cb) {
+        if(!team || !user_id) {
             return;
         }
 
         var conditions = {
             id: team.id,
-            'users.id': { $ne: user.id }
+            'users.user': { $ne: user_id }
         };
-
-        var user = new User({
-            id:     user.id,
-            name:   user.name   || '',
-            email:  user.email  || '',
-            avatar: user.avatar || '',
-            roles:  user.roles  || []
-        });
 
         var update = {
             $addToSet: {
-                users: user
+                users: {
+                    user: user_id
+                }
             }
         };
 
@@ -72,12 +66,9 @@ module.exports = function TeamStore(miit) {
             .findOne({
                 id: team.id
             }, {
-                _id: false,
-                'users.id':     true,
-                'users.name':   true,
-                'users.avatar': true,
-                'users.roles':  true
+                _id: false
             })
+            .populate('users.user')
             .exec(function(err, team) {
                 // Log the error
                 if(err) {
@@ -85,7 +76,11 @@ module.exports = function TeamStore(miit) {
                 }
 
                 if(typeof cb === 'function') {
-                    cb(err, (team || {}).users || []);
+                    var users = ((team || {}).users || []).map(function(user) {
+                        return (user || {}).user;
+                    });
+
+                    cb(err, users);
                 }
             });
     };

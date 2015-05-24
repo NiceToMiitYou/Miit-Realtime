@@ -11,6 +11,7 @@ var Models = [
 ];
 
 var Stores = [
+    'UserStore',
     'TeamStore',
     'StatusStore'
 ];
