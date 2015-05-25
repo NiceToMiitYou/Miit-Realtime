@@ -20,11 +20,11 @@ module.exports = function UserStore(miit) {
             upsert: true,
             "new":  true
         }, function(err, doc) {
-
             // Log the error
             if(err) {
                 miit.logger.error(err);
             }
+
             if(typeof cb === 'function') {
                 cb(err, doc);
             }

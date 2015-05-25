@@ -31,14 +31,16 @@ module.exports = function (req, done) {
                     UserStore.create(user, function(errUser, doc) {
                         if(!err && !errUser) {
                             miit.stores.TeamStore.addUser(team, doc._id, user.roles);
+
+                            user.db_id = doc._id;
+
+                            req.user = user;
+                            req.team = team;
+
+                            return done();
                         }
                     });
                 });
-
-                req.user = user;
-                req.team = team;
-
-                return done();
             }
             else
             {
