@@ -9,7 +9,6 @@ module.exports = function ConnectionManager(miit) {
         // Bind event from client
         spark.on('data', function (data){
             miit.logger.info(data);
-            miit.logger.info(spark.reserved(data.event));
 
             if(spark.reserved(data.event)) return;
 

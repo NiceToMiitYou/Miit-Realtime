@@ -15,6 +15,7 @@ module.exports = function Team(miit) {
                 type: ObjectId,
                 ref: 'User'
             },
+            roles:  [String],
             expire: {
                 type: Date,
                 expires: 86400,

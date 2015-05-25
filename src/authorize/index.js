@@ -20,16 +20,23 @@ module.exports = function (req, done) {
         miit.requests.checkAuthorization(userId, teamId, token, function(data) {
             if(data && data.type && data.type !== 'SESSION_UNDEFINED')
             {
-                miit.stores.TeamStore.createIfNotExist(data.team, function(err) {
-                    miit.stores.UserStore.createIfNotExist(data.user, function(errUser, user) {
+                var TeamStore = miit.stores.TeamStore;
+                var UserStore = miit.stores.UserStore;
+
+                var user = data.user;
+                var team = data.team;
+
+                // Create the team
+                TeamStore.create(team, function(err) {
+                    UserStore.create(user, function(errUser, doc) {
                         if(!err && !errUser) {
-                            miit.stores.TeamStore.addUserIfNotExist(data.team, user._id);
+                            miit.stores.TeamStore.addUser(team, doc._id, user.roles);
                         }
                     });
                 });
 
-                req.user = data.user;
-                req.team = data.team;
+                req.user = user;
+                req.team = team;
 
                 return done();
             }

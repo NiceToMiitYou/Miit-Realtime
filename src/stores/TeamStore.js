@@ -5,7 +5,7 @@ module.exports = function TeamStore(miit) {
     var User = miit.models.User;
     var Team = miit.models.Team;
 
-    this.createIfNotExist = function(team, cb) {
+    this.create = function(team, cb) {
         if(!team) {
             return;
         }
@@ -32,7 +32,7 @@ module.exports = function TeamStore(miit) {
         });
     };
 
-    this.addUserIfNotExist = function(team, user_id, cb) {
+    this.addUser = function(team, user_id, roles, cb) {
         if(!team || !user_id) {
             return;
         }
@@ -45,7 +45,8 @@ module.exports = function TeamStore(miit) {
         var update = {
             $addToSet: {
                 users: {
-                    user: user_id
+                    user:  user_id,
+                    roles: roles
                 }
             }
         };
@@ -64,11 +65,14 @@ module.exports = function TeamStore(miit) {
     this.getUsers = function(team, cb) {
         Team
             .findOne({
-                id: team.id
+                id:  team.id
             }, {
                 _id: false
             })
-            .populate('users.user')
+            .populate({
+                path:   'users.user',
+                select: '-_id id name avatar'
+            })
             .exec(function(err, team) {
                 // Log the error
                 if(err) {
@@ -76,8 +80,12 @@ module.exports = function TeamStore(miit) {
                 }
 
                 if(typeof cb === 'function') {
-                    var users = ((team || {}).users || []).map(function(user) {
-                        return (user || {}).user;
+                    var users = ((team || {}).users || []).map(function(userTeam) {
+                        var user =  (userTeam || {}).user || {};
+                        
+                        user.roles = userTeam.roles;
+
+                        return user;
                     });
 
                     cb(err, users);

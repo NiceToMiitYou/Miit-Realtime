@@ -4,7 +4,7 @@ module.exports = function UserStore(miit) {
 
     var User = miit.models.User;
 
-    this.createIfNotExist = function(user, cb) {
+    this.create = function(user, cb) {
         if(!user) {
             return;
         }
@@ -15,8 +15,7 @@ module.exports = function UserStore(miit) {
             id:     user.id,
             name:   user.name   || '',
             email:  user.email  || '',
-            avatar: user.avatar || '',
-            roles:  user.roles  || []
+            avatar: user.avatar || ''
         }, {
             upsert: true,
             "new":  true
