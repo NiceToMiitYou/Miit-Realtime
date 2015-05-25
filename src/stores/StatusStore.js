@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function TeamStore(miit) {
+module.exports = function StatusStore(miit) {
 
     var Status = miit.models.Status;
 
